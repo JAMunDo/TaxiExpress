@@ -55,7 +55,7 @@ public class MapsActivity extends FragmentActivity implements
 
         // Add a marker in Jamaica(UWI) and move the camera
         LatLng jamaica = new LatLng(	18.005801, -76.741950);
-        mMap.addMarker(new MarkerOptions().position(jamaica).title("Marker in Jamaica"));
+        mMap.addMarker(new MarkerOptions().position(jamaica).title("Your Location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(jamaica));
         mMap.setMyLocationEnabled(true);
         mMap.getMaxZoomLevel();
