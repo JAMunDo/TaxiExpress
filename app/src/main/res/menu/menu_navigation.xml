@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/tracktaxi"
+        android:title="Track Taxi"
+        android:enabled="true"
+        android:icon="@drawable/ic_taxi"/>
+    <item
+        android:id="@+id/routes"
+        android:title="Routes"
+        android:enabled="true"
+        android:icon="@drawable/ic_route"/>
+    <item
+        android:id="@+id/scan"
+        android:title="Scan"
+        android:icon="@drawable/ic_scan"/>
+    <item
+        android:id="@+id/profile"
+        android:title="Profile"
+        android:icon="@drawable/ic_profile"/>
+</menu>
