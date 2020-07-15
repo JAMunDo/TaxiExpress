@@ -1,8 +1,5 @@
 package com.example.taxiexpress;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
@@ -60,7 +57,7 @@ public class MapsActivity extends FragmentActivity implements
         LatLng jamaica = new LatLng(	18.005801, -76.741950);
         mMap.addMarker(new MarkerOptions().position(jamaica).title("Your Location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(jamaica));
-        mMap.setMyLocationEnabled(true);
+       // mMap.setMyLocationEnabled(true);
         mMap.getMaxZoomLevel();
         mMap.setMaxZoomPreference(100);
 
