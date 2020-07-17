@@ -1,20 +1,38 @@
 package com.example.taxiexpress;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Login extends AppCompatActivity {
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
+import static android.text.TextUtils.isEmpty;
+
+public class Login extends AppCompatActivity implements  View.OnClickListener {
+
+    private static final String TAG = "Login";
+
+    //Firebase
+    private FirebaseAuth.AuthStateListener mAuthListener;
     ImageButton signin, register;
     EditText email,password;
-    String emailLogin = "BroGad@gmail.com",passwordLogin = "Password";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,39 +41,110 @@ public class Login extends AppCompatActivity {
         password = findViewById(R.id.password);
         signin = findViewById(R.id.signin);
         register = findViewById(R.id.register);
-        signin.setOnClickListener(new View.OnClickListener() {
 
+        signin.setOnClickListener(this);
+        register.setOnClickListener(this);
+        setupFirebaseAuth();
+    }
+
+    private void setupFirebaseAuth(){
+        Log.d(TAG, "setupFirebaseAuth: started.");
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
-            public void onClick(View v) {
-                String text1 = String.valueOf(email.getText());
-                String text2 = String.valueOf(password.getText());
-                if(!text1.equals(emailLogin) && !text2.equals(passwordLogin)){
-                    incorrect();
-                }else{
-                    signUp();
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    Toast.makeText(Login.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
+
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                            .build();
+                    db.setFirestoreSettings(settings);
+
+                    DocumentReference userRef = db.collection(getString(R.string.collection_users))
+                            .document(user.getUid());
+
+                    userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if(task.isSuccessful()){
+                                Log.d(TAG, "onComplete: successfully set the user client.");
+                                User user = task.getResult().toObject(User.class);
+                                ((Client)(getApplicationContext())).setUser(user);
+                            }
+                        }
+                    });
+
+                    Intent intent = new Intent(Login.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+
+                } else {
+                    // User is signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
-
+                // ...
             }
-        });
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                register();
-            }
-        });
+        };
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
     }
-    public void incorrect(){
-        Toast.makeText(this,"Incorrect Email/Password provided please try again", Toast.LENGTH_SHORT).show();
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
+        }
     }
-    public void signUp() {
-        Intent welcome = new Intent(this,MapsActivity.class);
-        startActivity(welcome);
-        finish();
+
+    private void signIn(){
+        //check if the fields are filled out
+        if(!isEmpty(email.getText().toString())
+                && !isEmpty(password.getText().toString())){
+            Log.d(TAG, "onClick: attempting to authenticate.");
+
+
+            FirebaseAuth.getInstance().signInWithEmailAndPassword(email.getText().toString(),
+                    password.getText().toString())
+                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            Intent profile = new Intent(Login.this, Profile.class);
+                            startActivity(profile);
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(Login.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }else{
+            Toast.makeText(Login.this, "You didn't fill in all the fields.", Toast.LENGTH_SHORT).show();
+        }
     }
-    public void register(){
-        Intent welcome1 = new Intent(Login.this,Register.class);
-        startActivity(welcome1);
-        finish();
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.register:{
+                Intent register = new Intent(Login.this, Register.class);
+                startActivity(register);
+                break;
+            }
+
+            case R.id.signin:{
+                signIn();
+                break;
+            }
+        }
     }
 }

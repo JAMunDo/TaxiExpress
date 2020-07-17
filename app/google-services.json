@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "645509393437",
+    "firebase_url": "https://locationapp-ccf56.firebaseio.com",
+    "project_id": "locationapp-ccf56",
+    "storage_bucket": "locationapp-ccf56.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:645509393437:android:7dd6aeff189a23ef016af4",
+        "android_client_info": {
+          "package_name": "com.example.taxiexpress"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "645509393437-rfl97hfua0dpb6u9ct630pronris2q9u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcgSBjG7i3iImS7-dt2KK8RhdKuT_gufo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "645509393437-rfl97hfua0dpb6u9ct630pronris2q9u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

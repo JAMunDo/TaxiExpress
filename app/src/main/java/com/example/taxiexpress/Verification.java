@@ -45,7 +45,7 @@ public class Verification extends Activity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!vcode.equals("9865")){
+                if(!vcode.equals("KY2242")){
                     incorrect();
                 }else{
                     verified();
@@ -56,7 +56,7 @@ public class Verification extends Activity {
 
     protected void sendSMSMessage() {
         phoneNo = "8768682192";
-        message = "9865";
+        message = "KY2242";
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.SEND_SMS)
@@ -79,7 +79,7 @@ public class Verification extends Activity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     SmsManager smsManager = SmsManager.getDefault();
                     smsManager.sendTextMessage(phoneNo, null, message, null, null);
-                    Toast.makeText(getApplicationContext(), "Code sent.",
+                    Toast.makeText(getApplicationContext(), "Verification code sent.",
                             Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(getApplicationContext(),

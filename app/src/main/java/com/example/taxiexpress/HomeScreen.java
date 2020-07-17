@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Circle;
@@ -23,17 +24,17 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class HomeScreen  extends FragmentActivity implements
-        OnMapReadyCallback{
+import static com.example.taxiexpress.Constant.MAPVIEW_BUNDLE_KEY;
+
+public class HomeScreen extends AppCompatActivity implements
+        OnMapReadyCallback {
     private GoogleMap map;
+    private MapView mapView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.mMap);
-        mapFragment.getMapAsync(this);
         //Initialize and assign variables
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         //Set Taxi selected
@@ -62,7 +63,13 @@ public class HomeScreen  extends FragmentActivity implements
                 return false;
             }
         });
-
+        Bundle mapViewBundle = null;
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+        }
+        mapView = (MapView) findViewById(R.id.mMap);
+        mapView.onCreate(mapViewBundle);
+        mapView.getMapAsync(this);
     }
 
 
@@ -74,7 +81,11 @@ public class HomeScreen  extends FragmentActivity implements
         LatLng jamaica = new LatLng(18.005801, -76.741950);
         map.addMarker(new MarkerOptions().position(jamaica).title("Your Location"));
         map.moveCamera(CameraUpdateFactory.newLatLng(jamaica));
-        //map.setMyLocationEnabled(true);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        map.setMyLocationEnabled(true);
         map.getMaxZoomLevel();
         map.setMaxZoomPreference(100);
 
@@ -87,4 +98,35 @@ public class HomeScreen  extends FragmentActivity implements
         //.fillColor(Color.BLUE));
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+    @Override
+    public void onLowMemory(){
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
 }
