@@ -46,5 +46,8 @@ dependencies {
     implementation 'com.google.zxing:core:3.3.3'
     implementation 'com.budiyev.android:code-scanner:2.1.0'
     implementation 'com.karumi:dexter:6.2.1'
+    implementation 'com.google.maps.android:android-maps-utils:2.0.3'
+    implementation 'com.google.maps:google-maps-services:0.14.0'
+    implementation 'org.slf4j:slf4j-simple:1.7.25'
 }
 apply plugin: 'com.google.gms.google-services'

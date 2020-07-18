@@ -136,11 +136,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="99dp"
         android:layout_marginEnd="253dp"
-        android:layout_marginBottom="292dp"
+        android:layout_marginBottom="340dp"
         android:text="Email"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.083"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -149,11 +149,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="99dp"
         android:layout_marginEnd="247dp"
-        android:layout_marginBottom="348dp"
+        android:layout_marginBottom="412dp"
         android:text="Username"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -162,11 +162,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="106dp"
         android:layout_marginEnd="247dp"
-        android:layout_marginBottom="412dp"
+        android:layout_marginBottom="492dp"
         android:text="Full name"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton

@@ -78,9 +78,9 @@ public class HomeScreen extends AppCompatActivity implements
         map = googleMap;
 
         // Add a marker in Jamaica(UWI) and move the camera
-        LatLng jamaica = new LatLng(18.005801, -76.741950);
+        /*LatLng jamaica = new LatLng(18.005801, -76.741950);
         map.addMarker(new MarkerOptions().position(jamaica).title("Your Location"));
-        map.moveCamera(CameraUpdateFactory.newLatLng(jamaica));
+        map.moveCamera(CameraUpdateFactory.newLatLng());*/
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -88,7 +88,6 @@ public class HomeScreen extends AppCompatActivity implements
         map.setMyLocationEnabled(true);
         map.getMaxZoomLevel();
         map.setMaxZoomPreference(100);
-
         // Zoom in, animating the camera.
         map.animateCamera(CameraUpdateFactory.zoomTo(17), 2000, null);
         Circle circle = map.addCircle(new CircleOptions()

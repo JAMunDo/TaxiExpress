@@ -47,7 +47,7 @@ private static int SPLASH_TIME_OUT=4000;
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent homeIntent = new Intent (MainActivity.this, Profile.class);
+                Intent homeIntent = new Intent (MainActivity.this, Register.class);
                 startActivity(homeIntent);
                 finish();
             }
@@ -163,8 +163,8 @@ private static int SPLASH_TIME_OUT=4000;
         Log.d(TAG, "onActivityResult: called.");
         if (requestCode == PERMISSIONS_REQUEST_ENABLE_GPS) {
             if (mLocationPermissionGranted) {
-                Toast.makeText(this, "It works!!!", Toast.LENGTH_SHORT).show();
-               // getLastKnownLocation();
+               // Toast.makeText(this, "It works!!!", Toast.LENGTH_SHORT).show();
+                getLastKnownLocation();
             } else {
                 getLocationPermission();
             }
@@ -176,7 +176,7 @@ private static int SPLASH_TIME_OUT=4000;
         super.onResume();
         if(checkMapServices())
             if(mLocationPermissionGranted){
-               // getLastKnownLocation();
+                getLastKnownLocation();
             }else{
                 getLocationPermission();
             }

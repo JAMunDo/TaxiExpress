@@ -127,7 +127,7 @@ public class Register extends AppCompatActivity implements
     private void redirectLoginScreen(){
         Log.d(TAG, "redirectLoginScreen: redirecting to login screen.");
 
-        Intent intent = new Intent(Register.this, Login.class);
+        Intent intent = new Intent(Register.this, HomeScreen.class);
         startActivity(intent);
         finish();
     }
