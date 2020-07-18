@@ -114,7 +114,7 @@ private static int SPLASH_TIME_OUT=4000;
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
-            Toast.makeText(this, "It works!!!!", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(this, "It works!!!!", Toast.LENGTH_SHORT).show();
            // getLastKnownLocation();
         } else {
             ActivityCompat.requestPermissions(this,
@@ -164,7 +164,7 @@ private static int SPLASH_TIME_OUT=4000;
         if (requestCode == PERMISSIONS_REQUEST_ENABLE_GPS) {
             if (mLocationPermissionGranted) {
                // Toast.makeText(this, "It works!!!", Toast.LENGTH_SHORT).show();
-                getLastKnownLocation();
+              //  getLastKnownLocation();
             } else {
                 getLocationPermission();
             }
@@ -176,7 +176,7 @@ private static int SPLASH_TIME_OUT=4000;
         super.onResume();
         if(checkMapServices())
             if(mLocationPermissionGranted){
-                getLastKnownLocation();
+                //getLastKnownLocation();
             }else{
                 getLocationPermission();
             }

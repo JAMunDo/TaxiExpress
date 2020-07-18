@@ -118,7 +118,8 @@ public class Register extends AppCompatActivity implements
                     && !isEmpty(pw.getText().toString())) {
 
                 //Initiate registration task
-                registerNewEmail(memail.getText().toString(), pw.getText().toString(),uname.getText().toString(),fname.getText().toString(),phone.getText().toString());
+               // registerNewEmail(memail.getText().toString(), pw.getText().toString(),uname.getText().toString(),fname.getText().toString(),phone.getText().toString());
+                redirectLoginScreen();
             } else {
                 Toast.makeText(Register.this, "You must fill out all the fields", Toast.LENGTH_SHORT).show();
             }
