@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "645509393437-jj7uph9kjplbg2lj5bi3i4gm0fkapdom.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.taxiexpress",
+            "certificate_hash": "30cdff3938871f52356058bbd937c836141506e6"
+          }
+        },
+        {
           "client_id": "645509393437-rfl97hfua0dpb6u9ct630pronris2q9u.apps.googleusercontent.com",
           "client_type": 3
         }

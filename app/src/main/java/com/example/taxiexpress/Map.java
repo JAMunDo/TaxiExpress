@@ -32,9 +32,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.security.Permission;
 import java.util.List;
@@ -51,14 +53,12 @@ import static com.example.taxiexpress.Constant.PERMISSIONS_REQUEST_ENABLE_GPS;
 
 public class Map extends AppCompatActivity {
 
-    public static final int DEFAULT_UPDATE_INTERVAL = 3;
-    public static final int FAST_UPDATE_INTERVAL = 5;
-    private static final int PERMISSIONS_FINE_LOCATION = 99;
     TextView tv_lon, tv_altitude, tv_accuracy, tv_speed, tv_sensor, tv_updates, tv_lat, tv_address;
     Switch sw_locationupdates, sw_gps;
     private boolean mLocationPermissionGranted = false;
     private static final String TAG = "Map";
     private FirebaseFirestore mDb;
+    private FusedLocationProviderClient fusedLocationProviderClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +75,27 @@ public class Map extends AppCompatActivity {
         sw_locationupdates = findViewById(R.id.sw_locationsupdates);
         sw_gps = findViewById(R.id.sw_gps);
         mDb = FirebaseFirestore.getInstance();
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
     }// end of OnCreateMethod
+
+    private void getLastKnownLocation() {
+        Log.d(TAG, "getLastKnownLocation; called.");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                if (task.isSuccessful()) {
+                    Location location = task.getResult();
+                    GeoPoint geopoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                    Log.d(TAG,"onComplete: latitude: " + geopoint.getLatitude());
+                    Log.d(TAG,"onComplete: longitude: " + geopoint.getLongitude());
+                }
+            }
+        });
+    }
 
     private boolean checkMapServices(){
         if(isServicesOK()){
@@ -122,6 +141,7 @@ public class Map extends AppCompatActivity {
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
             Toast.makeText(this, "It works!!!!", Toast.LENGTH_SHORT).show();
+            getLastKnownLocation();
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
@@ -152,16 +172,13 @@ public class Map extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[],
+                                           @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         mLocationPermissionGranted = false;
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mLocationPermissionGranted = true;
-                }
+        if (requestCode == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {// If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                mLocationPermissionGranted = true;
             }
         }
     }
@@ -170,14 +187,12 @@ public class Map extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult: called.");
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_ENABLE_GPS: {
-                if(mLocationPermissionGranted){
-                    Toast.makeText(this, "It works!!!", Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    getLocationPermission();
-                }
+        if (requestCode == PERMISSIONS_REQUEST_ENABLE_GPS) {
+            if (mLocationPermissionGranted) {
+                Toast.makeText(this, "It works!!!", Toast.LENGTH_SHORT).show();
+                getLastKnownLocation();
+            } else {
+                getLocationPermission();
             }
         }
 
@@ -189,6 +204,7 @@ public class Map extends AppCompatActivity {
         if(checkMapServices())
             if(mLocationPermissionGranted){
                 tv_address.setText("It works!!!");
+                getLastKnownLocation();
             }else{
                 getLocationPermission();
             }

@@ -44,6 +44,7 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
 
         signin.setOnClickListener(this);
         register.setOnClickListener(this);
+
         setupFirebaseAuth();
     }
 

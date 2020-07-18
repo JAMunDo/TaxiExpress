@@ -56,7 +56,7 @@ public class Register extends AppCompatActivity implements
      * @param phone
      * @param username
      */
-    public void registerNewEmail(final String email, String password, final String name, final String phone, final String username){
+    public void registerNewEmail(final String email, final String password, final String name, final String phone, final String username){
 
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -73,6 +73,7 @@ public class Register extends AppCompatActivity implements
                             user.setPhone(phone);
                             user.setEmail(email);
                             user.setUsername(username);
+                            user.setPassword(password);
                             user.setUser_id(FirebaseAuth.getInstance().getUid());
 
                             FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
