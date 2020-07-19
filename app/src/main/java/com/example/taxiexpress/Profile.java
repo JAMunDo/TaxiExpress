@@ -6,15 +6,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
-public class Profile extends AppCompatActivity {
+public class Profile extends AppCompatActivity implements View.OnClickListener {
 
+    ImageButton logout;
+    FirebaseAuth firebaseAuth;
+    private FirebaseAuth.AuthStateListener stateListener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        logout = findViewById(R.id.logout);
+        logout.setOnClickListener(this);
         //Initialize and assign variables
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         //Set Taxi selected
@@ -43,5 +51,12 @@ public class Profile extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+        FirebaseAuth.getInstance().signOut();
+        Intent register = new Intent(this, Login.class);
+        startActivity(register);
     }
 }

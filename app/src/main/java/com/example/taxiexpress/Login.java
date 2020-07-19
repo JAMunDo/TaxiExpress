@@ -58,8 +58,7 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
                 if (user != null) {
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                     Toast.makeText(Login.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                   /* FirebaseFirestore db = FirebaseFirestore.getInstance();
                     FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                             .build();
                     db.setFirestoreSettings(settings);
@@ -76,9 +75,9 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
                                 ((Client)(getApplicationContext())).setUser(user);
                             }
                         }
-                    });
+                    });*/
 
-                    Intent intent = new Intent(Login.this, MainActivity.class);
+                    Intent intent = new Intent(Login.this, Profile.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
@@ -118,9 +117,12 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-                            Intent profile = new Intent(Login.this, Profile.class);
-                            startActivity(profile);
-
+                            if(task.isSuccessful()) {
+                                Intent profile = new Intent(Login.this, Profile.class);
+                                startActivity(profile);
+                            }else{
+                                Toast.makeText(Login.this, "Incorrect Login", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                 @Override
