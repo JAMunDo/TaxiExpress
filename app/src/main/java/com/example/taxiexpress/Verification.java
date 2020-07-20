@@ -6,16 +6,13 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.telephony.SmsManager;
 
-import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.example.taxiexpress.R;
+import com.example.taxiexpress.credentials.Login;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -94,7 +91,7 @@ public class Verification extends Activity {
         Toast.makeText(this,"Incorrect verification code provided please try again", Toast.LENGTH_SHORT).show();
     }
     public void verified(){
-        Intent welcome1 = new Intent(Verification.this,Login.class);
+        Intent welcome1 = new Intent(Verification.this, Login.class);
         startActivity(welcome1);
         finish();
     }

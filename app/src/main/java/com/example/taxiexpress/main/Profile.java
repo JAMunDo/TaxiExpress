@@ -1,4 +1,4 @@
-package com.example.taxiexpress;
+package com.example.taxiexpress.main;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.example.taxiexpress.R;
+import com.example.taxiexpress.credentials.Login;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -38,13 +40,13 @@ public class Profile extends AppCompatActivity implements View.OnClickListener {
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.routes:
-                        startActivity(new Intent(getApplicationContext(),Routes.class));
+                        startActivity(new Intent(getApplicationContext(), Routes.class));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.profile:
                         return true;
                     case R.id.scan:
-                        startActivity(new Intent(getApplicationContext(),Scan.class));
+                        startActivity(new Intent(getApplicationContext(), Scan.class));
                         overridePendingTransition(0,0);
                         return true;
                 }

@@ -1,4 +1,4 @@
-package com.example.taxiexpress;
+package com.example.taxiexpress.credentials;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,19 +9,17 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.taxiexpress.main.Profile;
+import com.example.taxiexpress.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
 import static android.text.TextUtils.isEmpty;
 
@@ -31,7 +29,8 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
 
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
-    ImageButton signin, register;
+    ImageView register,phone;
+    ImageButton signin;
     EditText email,password;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +39,9 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
         signin = findViewById(R.id.signin);
-        register = findViewById(R.id.register);
-
+        register = findViewById(R.id.ivRegister);
+        phone = findViewById(R.id.ivphoneinstead);
+        phone.setOnClickListener(this);
         signin.setOnClickListener(this);
         register.setOnClickListener(this);
 
@@ -138,7 +138,7 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.register:{
+            case R.id.ivRegister:{
                 Intent register = new Intent(Login.this, Register.class);
                 startActivity(register);
                 break;
@@ -146,6 +146,11 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
 
             case R.id.signin:{
                 signIn();
+                break;
+            }
+            case R.id.ivphoneinstead:{
+                Intent phonenumber = new Intent(Login.this, LoginPhone.class);
+                startActivity(phonenumber);
                 break;
             }
         }

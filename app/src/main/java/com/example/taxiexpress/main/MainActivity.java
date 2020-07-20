@@ -1,4 +1,4 @@
-package com.example.taxiexpress;
+package com.example.taxiexpress.main;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +19,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.taxiexpress.R;
+import com.example.taxiexpress.credentials.Login;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;

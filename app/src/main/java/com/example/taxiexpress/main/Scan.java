@@ -1,4 +1,4 @@
-package com.example.taxiexpress;
+package com.example.taxiexpress.main;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
+import com.example.taxiexpress.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.zxing.Result;
 import com.karumi.dexter.Dexter;
@@ -72,11 +73,11 @@ public class Scan extends AppCompatActivity {
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.routes:
-                        startActivity(new Intent(getApplicationContext(),Routes.class));
+                        startActivity(new Intent(getApplicationContext(), Routes.class));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.profile:
-                        startActivity(new Intent(getApplicationContext(),Profile.class));
+                        startActivity(new Intent(getApplicationContext(), Profile.class));
                         overridePendingTransition(0,0);
                         return true;
                     case R.id.scan:
