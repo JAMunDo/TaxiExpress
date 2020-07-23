@@ -2,9 +2,11 @@ package com.example.taxiexpress.main;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.MenuItemCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.taxiexpress.MapsActivity;
 import com.example.taxiexpress.R;
+import com.example.taxiexpress.routes.RouteDetails;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -29,45 +32,10 @@ public class Routes extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_routes);
-       // number83 = findViewById(R.id.number83);
-        //number84 = findViewById(R.id.number84);
-        searchView = (SearchView) findViewById(R.id.searchView);
-        listView = (ListView) findViewById(R.id.lv1);
-
-        list = new ArrayList<>();
-        list.add("Apple");
-        list.add("Banana");
-        list.add("Pineapple");
-        list.add("Orange");
-        list.add("Lychee");
-        list.add("Gavava");
-        list.add("Peech");
-        list.add("Melon");
-        list.add("Watermelon");
-        list.add("Papaya");
-
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,list);
-        listView.setAdapter(adapter);
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-
-                if(list.contains(query)){
-                    adapter.getFilter().filter(query);
-                }else{
-                    Toast.makeText(Routes.this, "No Match found",Toast.LENGTH_LONG).show();
-                }
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                //    adapter.getFilter().filter(newText);
-                return false;
-            }
-        });
-        number83.setOnClickListener(new View.OnClickListener() {
+        number83 = findViewById(R.id.number83);
+       number84 = findViewById(R.id.number84);
+        searchView = findViewById(R.id.searchView);
+              number83.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 buttonNumber83();
@@ -109,13 +77,16 @@ public class Routes extends AppCompatActivity {
     }
 
     private void buttonNumber84() {
-        Intent routes3 = new Intent(this, MapsActivity.class);
+
+        Intent routes3 = new Intent(this, RouteDetails.class);
+        routes3.putExtra("route","83");
         startActivity(routes3);
         finish();
     }
 
     public void buttonNumber83() {
-        Intent routes2 = new Intent(this,MapsActivity.class);
+        Intent routes2 = new Intent(this,RouteDetails.class);
+        routes2.putExtra("title","83");
         startActivity(routes2);
         finish();
     }
