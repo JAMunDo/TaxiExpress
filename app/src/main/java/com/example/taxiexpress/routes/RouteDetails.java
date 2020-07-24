@@ -100,11 +100,13 @@ public class RouteDetails extends AppCompatActivity implements OnMapReadyCallbac
         map.setMaxZoomPreference(100);
         // Zoom in, animating the camera.
         map.animateCamera(CameraUpdateFactory.zoomTo(17), 2000, null);
-        String title = getIntent().getStringExtra("route");
+        String title = getIntent().getStringExtra("title");
         mapDetails(title);
+
 
     }
     private void mapDetails(String title){
+
         switch (title) {
             case "83":
                 map.addMarker(new MarkerOptions().position(arrayList.get(1)).title("taxi2"));

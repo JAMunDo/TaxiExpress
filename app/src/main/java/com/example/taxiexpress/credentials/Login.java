@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.taxiexpress.main.HomeScreen;
 import com.example.taxiexpress.main.Profile;
 import com.example.taxiexpress.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -118,7 +119,7 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()) {
-                                Intent profile = new Intent(Login.this, Profile.class);
+                                Intent profile = new Intent(Login.this, HomeScreen.class);
                                 startActivity(profile);
                             }else{
                                 Toast.makeText(Login.this, "Incorrect Login", Toast.LENGTH_SHORT).show();

@@ -77,9 +77,9 @@ public class Routes extends AppCompatActivity {
     }
 
     private void buttonNumber84() {
-
+        String title = "83";
         Intent routes3 = new Intent(this, RouteDetails.class);
-        routes3.putExtra("route","83");
+        routes3.putExtra("route",title);
         startActivity(routes3);
         finish();
     }
