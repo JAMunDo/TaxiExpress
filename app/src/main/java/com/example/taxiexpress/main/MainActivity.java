@@ -19,9 +19,11 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.taxiexpress.Distance;
 import com.example.taxiexpress.MapsActivity;
 import com.example.taxiexpress.R;
 import com.example.taxiexpress.credentials.Login;
+import com.example.taxiexpress.credentials.LoginPhone;
 import com.example.taxiexpress.routes.RouteDetails;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -51,7 +53,7 @@ private static int SPLASH_TIME_OUT=4000;
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent homeIntent = new Intent (MainActivity.this, Login.class);
+                Intent homeIntent = new Intent (MainActivity.this, LoginPhone.class);
                 startActivity(homeIntent);
                 finish();
             }

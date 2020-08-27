@@ -60,7 +60,7 @@ public class LoginPhone extends AppCompatActivity implements  View.OnClickListen
                 break;
             }
 
-            case R.id.signin:{
+            case R.id.signinbtn:{
                 verifySignInCode();
                 break;
             }
@@ -104,7 +104,8 @@ public class LoginPhone extends AppCompatActivity implements  View.OnClickListen
                 });
     }
     private void sendVerification(){
-        phoneNumber = phone.getText().toString();
+        //format has to be  +1 888-999-9999
+        phoneNumber ="+1 " + phone.getText().toString();
         if(phoneNumber.isEmpty()){
             phone.setError("Phone number is empty");
             phone.requestFocus();

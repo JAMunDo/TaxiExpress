@@ -30,7 +30,7 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
 
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
-    ImageView register,phone;
+    ImageView register,phone,forgot;
     ImageButton signin;
     EditText email,password;
     @Override
@@ -42,9 +42,11 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
         signin = findViewById(R.id.signin);
         register = findViewById(R.id.ivRegister);
         phone = findViewById(R.id.ivphoneinstead);
+        forgot = findViewById(R.id.forgotpassword);
         phone.setOnClickListener(this);
         signin.setOnClickListener(this);
         register.setOnClickListener(this);
+        forgot.setOnClickListener(this);
 
         setupFirebaseAuth();
     }
@@ -152,6 +154,11 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
             case R.id.ivphoneinstead:{
                 Intent phonenumber = new Intent(Login.this, LoginPhone.class);
                 startActivity(phonenumber);
+                break;
+            }
+            case R.id.forgotpassword:{
+                Intent forgot = new Intent(Login.this,ForgotP.class);
+                startActivity(forgot);
                 break;
             }
         }
