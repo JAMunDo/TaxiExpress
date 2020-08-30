@@ -54,7 +54,7 @@ private static int SPLASH_TIME_OUT=4000;
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent homeIntent = new Intent (MainActivity.this, ForgotP.class);
+                Intent homeIntent = new Intent (MainActivity.this, Login.class);
                 startActivity(homeIntent);
                 finish();
             }

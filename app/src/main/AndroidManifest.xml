@@ -29,7 +29,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".credentials.ForgotP"></activity>
+        <activity android:name=".Split"></activity>
+        <activity android:name=".credentials.ForgotP" />
         <activity android:name=".Distance" />
         <activity android:name=".routes.RouteDetails" />
         <activity android:name=".TaxiDetails" />
