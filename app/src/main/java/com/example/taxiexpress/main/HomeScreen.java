@@ -13,8 +13,10 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.example.taxiexpress.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,6 +41,7 @@ public class HomeScreen extends AppCompatActivity implements
         OnMapReadyCallback {
     private GoogleMap map;
     private MapView mapView;
+    private TextView distance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +88,14 @@ public class HomeScreen extends AppCompatActivity implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+        distance= findViewById(R.id.distance);
+        Location location = new Location("");
+        Location taxilocation = new Location("");
+        taxilocation.setLatitude(18.016755 );
+        taxilocation.setLongitude(-76.750349);
+        location.getLatitude();
+        location.getLongitude();
+        distance.setText("The taxi is "+ (location.distanceTo(taxilocation))/100000 +" away from your position");
         LatLng jamaica = new LatLng(18.005457, -76.741969);
         LatLng taxi1 = new LatLng(18.006058, -76.741963);
         map.addMarker(new MarkerOptions().position(jamaica).title("Mark Jacobs").icon(bitmapDescriptorFromVector(getApplicationContext(),R.drawable.taximarker)));
