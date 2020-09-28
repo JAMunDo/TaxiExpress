@@ -109,7 +109,7 @@ public class Profile extends AppCompatActivity implements View.OnClickListener,
 
     @Override
     public boolean onDoubleTap(MotionEvent e) {
-        Toast.makeText(Profile.this, "Panic mode activated", Toast.LENGTH_SHORT).show();
+       // Toast.makeText(Profile.this, "Panic mode activated", Toast.LENGTH_SHORT).show();
         return true;
     }
 
