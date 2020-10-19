@@ -26,6 +26,7 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.example.taxiexpress.R;
+import com.example.taxiexpress.TaxiRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -111,6 +112,7 @@ public class HomeScreen extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 new Url(HomeScreen.this).execute(getUrl(place1.getPosition(), place2.getPosition(), "driving"), "driving");
+
             }
         });
     }
@@ -131,8 +133,6 @@ public class HomeScreen extends AppCompatActivity implements
         distance.setText("The taxi is "+ (location.distanceTo(taxilocation))/100000 +" away from your position");
         LatLng jamaica = new LatLng(18.005457, -76.741969);
         LatLng taxi1 = new LatLng(18.006058, -76.741963);
-       // map.addMarker(new MarkerOptions().position(jamaica).title("Mark Jacobs").icon(bitmapDescriptorFromVector(getApplicationContext(),R.drawable.taximarker)));
-       // map.addMarker(new MarkerOptions().position(taxi1).title("Bobby Brown").icon(bitmapDescriptorFromVector(getApplicationContext(),R.drawable.taximarker)));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -191,6 +191,7 @@ public class HomeScreen extends AppCompatActivity implements
             Geocoder geocoder = new Geocoder(HomeScreen.this);
             try{
                 addressList = geocoder.getFromLocationName(location,1);
+                Log.d(TAG, "AddressList: "+addressList);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -259,5 +260,13 @@ public class HomeScreen extends AppCompatActivity implements
         if (currentPolyline != null)
             currentPolyline.remove();
         currentPolyline = map.addPolyline((PolylineOptions) values[0]);
+    }
+
+    private void taxiRequest(com.google.maps.model.LatLng origin, com.google.maps.model.LatLng dest){
+        TaxiRequest taxiRequest = new TaxiRequest();
+        taxiRequest.setName("Mark Phillips");
+        taxiRequest.setOrigin(origin);
+        taxiRequest.setDestination(dest);
+        taxiRequest.setState(1);
     }
 }

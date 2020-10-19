@@ -123,8 +123,8 @@
 
     <ImageView
         android:id="@+id/ivphoneinstead"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="347dp"
+        android:layout_height="29dp"
         android:layout_marginStart="71dp"
         android:layout_marginTop="7dp"
         android:layout_marginEnd="70dp"

@@ -1,8 +1,9 @@
 package com.example.taxiexpress;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class User implements Parcelable{
+public class Driver implements Parcelable {
 
     private String email;
     private String user_id;
@@ -12,7 +13,7 @@ public class User implements Parcelable{
     private String password;
     private int type;
 
-    public User(String email, String user_id, String username, String name, String phone, String password, int type) {
+    public Driver(String email, String user_id, String username, String name, String phone, String password, int type) {
         this.email = email;
         this.user_id = user_id;
         this.username = username;
@@ -22,18 +23,18 @@ public class User implements Parcelable{
         this.type = type;
     }
 
-    public User() {
+    public Driver() {
 
     }
 
-    protected User(Parcel in) {
+    protected Driver(Parcel in) {
         email = in.readString();
         user_id = in.readString();
         username = in.readString();
         name = in.readString();
         phone = in.readString();
         password = in.readString();
-        type = in.readInt();
+        type =in.readInt();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -111,7 +112,7 @@ public class User implements Parcelable{
 
     @Override
     public String toString() {
-        return "User{" +
+        return "Driver{" +
                 "email='" + email + '\'' +
                 ", user_id='" + user_id + '\'' +
                 ", username='" + username + '\'' +
