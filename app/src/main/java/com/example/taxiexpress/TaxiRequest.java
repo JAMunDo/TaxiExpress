@@ -73,4 +73,8 @@ public class TaxiRequest {
                 ", state=" + state +
                 '}';
     }
+
+    private void postTaxiRequest (TaxiRequest taxiRequest){
+
+    }
 }
