@@ -16,6 +16,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -25,9 +27,11 @@ import com.google.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import services.RequestService;
 
 public class MainActivity2 extends AppCompatActivity implements SearchView.OnQueryTextListener, DialogMessage.DialogMessageListener {
     public static final String Data = "TAXI.D.lat";
@@ -36,7 +40,9 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
     public static final String Data3 = "TAXI.O.lng";
     SearchView searchView;
     Geocoder geocoder;
+    String fireid;
     HashMap<String, Double> hdest,hori;
+    List<String> documentId = new ArrayList<>();
     List<Object> dest = new ArrayList<>();
     List<Object> ori = new ArrayList<>();
     LatLng destination,origin;
@@ -47,9 +53,9 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
     List<String> test = new ArrayList<>();
     List<String> lat = new ArrayList<>();
     List<String> lng = new ArrayList<>();
-    String [] values = {"Romario","Kehli","Keisha","Daequan"};
     // Access a Cloud Firestore instance from your Activity
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
 
     @Override
@@ -60,6 +66,9 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
         refresh = findViewById(R.id.refresh);
         service = findViewById(R.id.Service);
        // searchView = findViewById(R.id.testsearch);
+
+
+
         listView = findViewById(R.id.testview);
         dialog.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,30 +106,35 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
             }
         });
         db.collection("Requests").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                List<User> mMissionsList = new ArrayList<>();
+                if (user != null) {
+                    String email = user.getEmail();
+                    Log.d("Firebase","User: "+user);
 
-                if(task.isSuccessful()){
-                    for(DocumentSnapshot document : task.getResult()) {
-                       // User miss = document.toObject(User.class);
-                        test.add(document.getString("name")+" \n"+document.getString("description"));
-                        dest.add(document.get("destination"));
-                        ori.add(document.get("origin"));
-                        lat.add(document.getString("Latitude"));
-                        lng.add(document.getString("Longitude"));
-                       // miss.setPassword("");
-                        //miss.setUser_id("");
-                       // mMissionsList.add(miss);
-                    }
+                    if(task.isSuccessful()){
+                        for(DocumentSnapshot document : task.getResult()) {
+                            if(Objects.requireNonNull(user.getEmail()).contentEquals(Objects.requireNonNull(document.getString("taxiId")))) {
+                                test.add(document.getString("name") + " \n" + document.getString("description"));
+                                dest.add(document.get("destination"));
+                                ori.add(document.get("origin"));
+                                documentId.add(document.getId());
+                                lat.add(document.getString("Latitude"));
+                                lng.add(document.getString("Longitude"));
+                            }
+                        }
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1,test);
                     adapter.notifyDataSetChanged();
                     listView.setAdapter(adapter);
-                    Log.d("Test","Value: "+ test);
                     Log.d("MissionActivity", "It reached the snapshot");
+                    } else {
+                        Log.d("MissionActivity", "Error getting documents: ", task.getException());
+                    }
                 } else {
-                    Log.d("MissionActivity", "Error getting documents: ", task.getException());
+                    Log.d("Firebase","No information provided");
                 }
+
             }
         });
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -131,8 +145,7 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
                 hdest = (HashMap<String, Double>) dest.get(position);
                 destination = new LatLng(hdest.get("lat"),hdest.get("lng"));
                 origin = new LatLng(hori.get("lat"),hori.get("lng"));
-                String longitude = lng.get(position) ;
-                String latitude = lat.get(position) ;
+                fireid = documentId.get(position);
                 openDialog();
 
             }
@@ -169,14 +182,12 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
     }
 
     @Override
-    public void onYesClicked() {
+    public void onYesClicked() {//Updates the request to let the customer kow it has been accepted
         Toast.makeText(MainActivity2.this, "It works", Toast.LENGTH_LONG).show();
         Log.d("MissionActivity", "Yess clicked works");
-        DocumentReference Ref = db.collection("Requests").document("0d4BMBkQwEVHuPH057sv");
-
-// Set the "isCapital" field of the city 'DC'
+        DocumentReference Ref = db.collection("Requests").document(fireid);//Collection and document path
         Ref
-                .update("state", 2)
+                .update("state", 2)//firestore update call
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -195,29 +206,5 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
         profile.putExtra(Data2, String.valueOf(origin.lat));
         profile.putExtra(Data3, String.valueOf(origin.lng));
         startActivity(profile);
-        // Add a new document with a generated id.
-      /*  Map<String, Object> data = new HashMap<>();
-        data.put("description", "Tokyo");
-        data.put("destination1", "18.005418");
-        data.put("destination2", "-76.741962");
-        data.put("location1", "18.011042");
-        data.put("location2", "-76.796428");
-        data.put("name", "Tokyo");
-
-
-        db.collection("Requests")
-                .add(data)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d("Success", "DocumentSnapshot written with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("Failure", "Error adding document", e);
-                    }
-                });*/
-
     }
 }
