@@ -61,7 +61,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="160dp"
         android:layout_marginBottom="80dp"
-        android:text="Button"
+        android:text="Directions"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

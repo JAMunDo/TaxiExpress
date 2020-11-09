@@ -18,7 +18,7 @@ public class DialogMessage extends AppCompatDialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Request A Taxi")
-                .setMessage("Do you want to request a taxi?")
+                .setMessage("Do you want to book this taxi?")
                 .setNegativeButton("No", (dialog, which) -> {
 
                 })

@@ -24,6 +24,8 @@ import com.example.taxiexpress.MainActivity2;
 import com.example.taxiexpress.Map;
 import com.example.taxiexpress.MapsActivity;
 import com.example.taxiexpress.R;
+import com.example.taxiexpress.Split;
+import com.example.taxiexpress.TaxiDetails;
 import com.example.taxiexpress.credentials.ForgotP;
 import com.example.taxiexpress.credentials.Login;
 import com.example.taxiexpress.credentials.LoginPhone;
@@ -57,7 +59,7 @@ private static int SPLASH_TIME_OUT=4000;
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent homeIntent = new Intent (MainActivity.this, Map.class);
+                Intent homeIntent = new Intent (MainActivity.this, MainActivity2.class);
                 startActivity(homeIntent);
                 finish();
             }

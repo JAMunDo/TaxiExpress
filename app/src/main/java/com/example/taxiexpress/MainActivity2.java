@@ -1,5 +1,7 @@
 package com.example.taxiexpress;
 
+import android.content.Intent;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,7 +12,6 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import com.example.taxiexpress.main.HomeScreen;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -19,23 +20,33 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import directions.Url;
 
 public class MainActivity2 extends AppCompatActivity implements SearchView.OnQueryTextListener, DialogMessage.DialogMessageListener {
+    public static final String Data = "TAXI.D.lat";
+    public static final String Data1 ="TAXI.D.lng";
+    public static final String Data2 = "TAXI.O.lat";
+    public static final String Data3 = "TAXI.O.lng";
     SearchView searchView;
+    Geocoder geocoder;
+    HashMap<String, Double> hdest,hori;
+    List<Object> dest = new ArrayList<>();
+    List<Object> ori = new ArrayList<>();
+    LatLng destination,origin;
     ListView listView;
     ArrayList<String> list;
     ArrayAdapter<String> adapter;
-    Button dialog,refresh;
+    Button dialog,refresh,service;
     List<String> test = new ArrayList<>();
+    List<String> lat = new ArrayList<>();
+    List<String> lng = new ArrayList<>();
     String [] values = {"Romario","Kehli","Keisha","Daequan"};
     // Access a Cloud Firestore instance from your Activity
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -47,6 +58,7 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
         setContentView(R.layout.activity_main2);
         dialog = findViewById(R.id.dialog);
         refresh = findViewById(R.id.refresh);
+        service = findViewById(R.id.Service);
        // searchView = findViewById(R.id.testsearch);
         listView = findViewById(R.id.testview);
         dialog.setOnClickListener(new View.OnClickListener() {
@@ -66,10 +78,9 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
                         if(task.isSuccessful()){
                             for(DocumentSnapshot document : task.getResult()) {
                                 // User miss = document.toObject(User.class);
-                                test.add(document.getString("name")+" \n"+document.getString("description"));
-                                // miss.setPassword("");
-                                //miss.setUser_id("");
-                                // mMissionsList.add(miss);
+                                test.add(document.getString("Name")+" \n"+document.getString("Latitude")+" \n"+document.getString("Longitude"));
+                                lat.add(document.getString("Latitude"));
+                                lng.add(document.getString("Longitude"));
                             }
                             ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1,test);
                             adapter.notifyDataSetChanged();
@@ -94,6 +105,10 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
                     for(DocumentSnapshot document : task.getResult()) {
                        // User miss = document.toObject(User.class);
                         test.add(document.getString("name")+" \n"+document.getString("description"));
+                        dest.add(document.get("destination"));
+                        ori.add(document.get("origin"));
+                        lat.add(document.getString("Latitude"));
+                        lng.add(document.getString("Longitude"));
                        // miss.setPassword("");
                         //miss.setUser_id("");
                        // mMissionsList.add(miss);
@@ -101,6 +116,7 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1,test);
                     adapter.notifyDataSetChanged();
                     listView.setAdapter(adapter);
+                    Log.d("Test","Value: "+ test);
                     Log.d("MissionActivity", "It reached the snapshot");
                 } else {
                     Log.d("MissionActivity", "Error getting documents: ", task.getException());
@@ -111,7 +127,21 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(MainActivity2.this,"You choose" + test.get(position),Toast.LENGTH_SHORT).show();
+                hori =  (HashMap<String, Double>) ori.get(position);
+                hdest = (HashMap<String, Double>) dest.get(position);
+                destination = new LatLng(hdest.get("lat"),hdest.get("lng"));
+                origin = new LatLng(hori.get("lat"),hori.get("lng"));
+                String longitude = lng.get(position) ;
+                String latitude = lat.get(position) ;
                 openDialog();
+
+            }
+        });
+        service.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startService(new Intent(getApplicationContext(), RequestService.class));
+
             }
         });
 
@@ -142,11 +172,36 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
     public void onYesClicked() {
         Toast.makeText(MainActivity2.this, "It works", Toast.LENGTH_LONG).show();
         Log.d("MissionActivity", "Yess clicked works");
+        DocumentReference Ref = db.collection("Requests").document("0d4BMBkQwEVHuPH057sv");
+
+// Set the "isCapital" field of the city 'DC'
+        Ref
+                .update("state", 2)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("Apache", "DocumentSnapshot successfully updated!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("Apache", "Error updating document", e);
+                    }
+                });
+        Intent profile = new Intent(MainActivity2.this, com.example.taxiexpress.Map.class);
+       profile.putExtra(Data, String.valueOf(destination.lat));
+       profile.putExtra(Data1, String.valueOf(destination.lng));
+        profile.putExtra(Data2, String.valueOf(origin.lat));
+        profile.putExtra(Data3, String.valueOf(origin.lng));
+        startActivity(profile);
         // Add a new document with a generated id.
-        Map<String, Object> data = new HashMap<>();
+      /*  Map<String, Object> data = new HashMap<>();
         data.put("description", "Tokyo");
-        data.put("destination", "Japan");
-        data.put("location", "Japan");
+        data.put("destination1", "18.005418");
+        data.put("destination2", "-76.741962");
+        data.put("location1", "18.011042");
+        data.put("location2", "-76.796428");
         data.put("name", "Tokyo");
 
 
@@ -162,7 +217,7 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
                     public void onFailure(@NonNull Exception e) {
                         Log.w("Failure", "Error adding document", e);
                     }
-                });
+                });*/
 
     }
 }

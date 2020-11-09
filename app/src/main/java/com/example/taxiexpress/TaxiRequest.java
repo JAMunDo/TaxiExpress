@@ -1,24 +1,38 @@
 package com.example.taxiexpress;
 
+import android.util.Log;
+import android.widget.Toast;
+
+import com.example.taxiexpress.main.HomeScreen;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.maps.model.LatLng;
+
+import androidx.annotation.NonNull;
 
 public class TaxiRequest {
 
     private String name;
-    private Timestamp time;
+    private String company;
+    //private Timestamp time;
     private LatLng destination;
     private LatLng origin;
     private int state;
+    private String taxiId; //Combination of Company and LPlate
 
-
-    public TaxiRequest(String name, Timestamp time, LatLng destination, LatLng origin, int state) {
+    public TaxiRequest(String name, String company, LatLng destination, LatLng origin, int state, String taxiId) {
         this.name = name;
-        this.time = time;
+        this.company = company;
         this.destination = destination;
         this.origin = origin;
         this.state = state;
+        this.taxiId = taxiId;
     }
+
+
 
     public TaxiRequest(){
     }
@@ -29,14 +43,6 @@ public class TaxiRequest {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Timestamp getTime() {
-        return time;
-    }
-
-    public void setTime(Timestamp time) {
-        this.time = time;
     }
 
     public LatLng getDestination() {
@@ -63,18 +69,45 @@ public class TaxiRequest {
         this.state = state;
     }
 
-    @Override
-    public String toString() {
-        return "TaxiRequest{" +
-                "name='" + name + '\'' +
-                ", time=" + time +
-                ", destination=" + destination +
-                ", origin=" + origin +
-                ", state=" + state +
-                '}';
+    public String getTaxiId() {
+        return taxiId;
     }
 
-    private void postTaxiRequest (TaxiRequest taxiRequest){
-
+    public void setTaxiId(String taxiId) {
+        this.taxiId = taxiId;
     }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    protected boolean postTaxiRequest (TaxiRequest taxiRequest){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        if(taxiRequest != null) {
+            db.collection("Requests")
+                    .add(taxiRequest)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        public void onSuccess(DocumentReference documentReference) {
+                            Log.d("Success", "DocumentSnapshot written with ID: " + documentReference.getId());
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("Failure", "Error adding document", e);
+
+                        }
+                    });
+            return true;
+        }else {
+            Log.w("Failure", "Request is null");
+            return false;
+        }
+    }
+
 }

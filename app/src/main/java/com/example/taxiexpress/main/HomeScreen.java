@@ -17,6 +17,8 @@ import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -24,8 +26,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.taxiexpress.DialogMessage;
 import com.example.taxiexpress.R;
+import com.example.taxiexpress.TaxiDetails;
 import com.example.taxiexpress.TaxiRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,6 +45,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PendingResult;
@@ -50,28 +56,50 @@ import java.util.List;
 import static com.example.taxiexpress.Constant.MAPVIEW_BUNDLE_KEY;
 
 public class HomeScreen extends AppCompatActivity implements
-        OnMapReadyCallback, SearchView.OnQueryTextListener, TaskCallback {
+        OnMapReadyCallback, SearchView.OnQueryTextListener, TaskCallback, DialogMessage.DialogMessageListener,LocationListener {
     private static final String TAG = "HomeScreen";
+    public static final String Unique1 = "HOME.O.long";
+    public static final String Unique2 = "HOME.O.Lat";
+    public static final String Unique3 = "HOME.D.long";
+    public static final String Unique4 = "HOME.D.Lat";
     private GoogleMap map;
     private MapView mapView;
     private TextView distance;
     private SearchView searchView;
     private SupportMapFragment mapFragment;
     private GeoApiContext context;
-    private LatLng user;
+    private LatLng origin,dest;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private Polyline currentPolyline;
     private MarkerOptions place1, place2;
+    private Address address;
+    private Location device;
+    private double lat,lng;
+    protected LocationManager locationManager;
+    protected LocationListener locationListener;
     Button getDirection;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
-         place1 = new MarkerOptions().position(new LatLng(18.005418, -76.741962));
-         place2 = new MarkerOptions().position(new LatLng(18.011042, -76.796428)).title("Location 2");
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, (LocationListener) this);
+        place1 = new MarkerOptions().position(new LatLng(18.005418, -76.741962));
+        place2 = new MarkerOptions().position(new LatLng(18.011042, -76.796428)).title("Location 2");
         //Initialize and assign variables
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+       BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         //Set Taxi selected
         bottomNavigationView.setSelectedItemId(R.id.tracktaxi);
         //Perform Item Selected Listener
@@ -105,16 +133,31 @@ public class HomeScreen extends AppCompatActivity implements
         mapView = (MapView) findViewById(R.id.mMap);
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
+
         searchView = findViewById(R.id.locator);
         searchView.setOnQueryTextListener(this);
         getDirection = findViewById(R.id.btnGetDirection);
         getDirection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new Url(HomeScreen.this).execute(getUrl(place1.getPosition(), place2.getPosition(), "driving"), "driving");
-
+                if(address !=null && device!=null) {
+                    dest = new LatLng(address.getLatitude(), address.getLongitude());
+                    origin = new LatLng(device.getLatitude(),device.getLongitude());
+                    new Url(HomeScreen.this).execute(getUrl(origin, dest, "driving"), "driving");
+                    openDialog();
+                }else{
+                    Log.d(TAG, "Address is empty");
+                    Toast.makeText(HomeScreen.this, "Cant get directions", Toast.LENGTH_LONG).show();
+                }
             }
         });
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        device = location;
+
+        // Toast.makeText(HomeScreen.this, "This device's location is: "+device.getLatitude() + "and"+device.getLongitude(), Toast.LENGTH_LONG).show();
     }
 
 
@@ -141,6 +184,7 @@ public class HomeScreen extends AppCompatActivity implements
         map.getMaxZoomLevel();
         map.setMaxZoomPreference(92);
     }
+
 
     @Override
     public void onResume() {
@@ -184,21 +228,32 @@ public class HomeScreen extends AppCompatActivity implements
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        String location = searchView.getQuery().toString();
+        String location = searchView.getQuery().toString()+",Jamaica";
         List<Address> addressList = null;
+        List<Address> addressList2 = null;
+        String place;
         map.clear();
         if(location  !=null || !location.equals("") ){
             Geocoder geocoder = new Geocoder(HomeScreen.this);
             try{
                 addressList = geocoder.getFromLocationName(location,1);
+                addressList2 = geocoder.getFromLocation(18.005457, -76.741969,1);
+               place= addressList2.get(0).getFeatureName() + ", "+addressList2.get(0).getSubLocality();
                 Log.d(TAG, "AddressList: "+addressList);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            Address address = addressList.get(0);
-            LatLng latLng = new LatLng(address.getLatitude(),address.getLongitude());
-            map.addMarker(new MarkerOptions().position(latLng).title(location));
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,10));
+            if(addressList.isEmpty()){
+                Log.d(TAG, "Addresslist is empty");
+                Toast.makeText(HomeScreen.this, "Cant find location", Toast.LENGTH_LONG).show();
+            }else {
+                address = addressList.get(0);
+                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                map.addMarker(new MarkerOptions().position(latLng).title(location));
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                map.setMaxZoomPreference(92);
+
+            }
         }
         return  false;
 
@@ -268,5 +323,83 @@ public class HomeScreen extends AppCompatActivity implements
         taxiRequest.setOrigin(origin);
         taxiRequest.setDestination(dest);
         taxiRequest.setState(1);
+    }
+
+    private void openDialog() {
+        DialogMessage dialog = new DialogMessage();
+        dialog.show(getSupportFragmentManager(),"Test");
+    }
+    @Override
+    public void onYesClicked() {
+        Geocoder geocoder = new Geocoder(HomeScreen.this);
+        Toast.makeText(HomeScreen.this, "It works", Toast.LENGTH_LONG).show();
+        List<Address> addressList2 = null;
+        //Log.d("MissionActivity", "Yess clicked works");
+        // Add a new document with a generated id.
+
+        if(address == null){
+            Toast.makeText(HomeScreen.this, "Need a destination location to post a request", Toast.LENGTH_LONG).show();
+            Log.d("Log", "No destination provided");
+        }else {
+                if (device == null) {
+                    Toast.makeText(HomeScreen.this, "Need an origin location to post a request", Toast.LENGTH_LONG).show();
+                    Log.d("Log", "No origin provided");
+                }else {
+                    Intent profile = new Intent(HomeScreen.this, TaxiDetails.class);
+                    profile.putExtra(Unique2,  String.valueOf(address.getLatitude()));
+                   profile.putExtra(Unique1,  String.valueOf(address.getLongitude()));
+                     profile.putExtra(Unique4, String.valueOf(device.getLatitude()));
+                    profile.putExtra(Unique3,  String.valueOf(device.getLongitude()));
+                    startActivity(profile);
+                }
+
+                /*else {
+                        try {
+                            addressList2 = geocoder.getFromLocation(address.getLatitude(), address.getLongitude(), 1);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("description", addressList2.get(0).getFeatureName() + ", " + addressList2.get(0).getSubLocality());
+                        data.put("destination1", address.getLatitude());
+                        data.put("destination2", address.getLongitude());
+                        data.put("location1", "18.011042");
+                        data.put("location2", "-76.796428");
+                        data.put("name", "Tokyo");
+
+
+                        db.collection("Requests")
+                        .add(data)
+                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            public void onSuccess(DocumentReference documentReference) {
+                                Log.d("Success", "DocumentSnapshot written with ID: " + documentReference.getId());
+                                Toast.makeText(HomeScreen.this, "Taxi Request submitted", Toast.LENGTH_LONG).show();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w("Failure", "Error adding document", e);
+                                Toast.makeText(HomeScreen.this, "Taxi Request not submitted", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }*/
+        }
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Log.d("Latitude","disable");
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Log.d("Latitude","enable");
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        Log.d("Latitude","status");
     }
 }

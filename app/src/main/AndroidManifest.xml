@@ -30,7 +30,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Split"></activity>
+        <activity android:name=".Success"></activity>
+
+        <service
+            android:name=".RequestService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".Split" />
         <activity android:name=".credentials.ForgotP" />
         <activity android:name=".Distance" />
         <activity android:name=".routes.RouteDetails" />
