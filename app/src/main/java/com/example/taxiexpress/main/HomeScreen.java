@@ -28,7 +28,7 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.taxiexpress.DialogMessage;
+import dialog.TaxiMessage;
 import com.example.taxiexpress.R;
 import com.example.taxiexpress.TaxiDetails;
 import com.example.taxiexpress.TaxiRequest;
@@ -56,7 +56,7 @@ import java.util.List;
 import static com.example.taxiexpress.Constant.MAPVIEW_BUNDLE_KEY;
 
 public class HomeScreen extends AppCompatActivity implements
-        OnMapReadyCallback, SearchView.OnQueryTextListener, TaskCallback, DialogMessage.DialogMessageListener,LocationListener {
+        OnMapReadyCallback, SearchView.OnQueryTextListener, TaskCallback, TaxiMessage.DialogMessageListener,LocationListener {
     private static final String TAG = "HomeScreen";
     public static final String Unique1 = "HOME.O.long";
     public static final String Unique2 = "HOME.O.Lat";
@@ -165,8 +165,6 @@ public class HomeScreen extends AppCompatActivity implements
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         distance= findViewById(R.id.distance);
-        map.addMarker(place1);
-        map.addMarker(place2);
         Location location = new Location("");
         Location taxilocation = new Location("");
         taxilocation.setLatitude(18.016755 );
@@ -326,7 +324,7 @@ public class HomeScreen extends AppCompatActivity implements
     }
 
     private void openDialog() {
-        DialogMessage dialog = new DialogMessage();
+        TaxiMessage dialog = new TaxiMessage();
         dialog.show(getSupportFragmentManager(),"Test");
     }
     @Override
@@ -346,44 +344,12 @@ public class HomeScreen extends AppCompatActivity implements
                     Log.d("Log", "No origin provided");
                 }else {
                     Intent profile = new Intent(HomeScreen.this, TaxiDetails.class);
-                    profile.putExtra(Unique2,  String.valueOf(address.getLatitude()));
-                   profile.putExtra(Unique1,  String.valueOf(address.getLongitude()));
-                     profile.putExtra(Unique4, String.valueOf(device.getLatitude()));
-                    profile.putExtra(Unique3,  String.valueOf(device.getLongitude()));
+                    profile.putExtra(Unique4,  String.valueOf(address.getLatitude()));
+                   profile.putExtra(Unique3,  String.valueOf(address.getLongitude()));
+                     profile.putExtra(Unique2, String.valueOf(device.getLatitude()));
+                    profile.putExtra(Unique1,  String.valueOf(device.getLongitude()));
                     startActivity(profile);
                 }
-
-                /*else {
-                        try {
-                            addressList2 = geocoder.getFromLocation(address.getLatitude(), address.getLongitude(), 1);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        Map<String, Object> data = new HashMap<>();
-                        data.put("description", addressList2.get(0).getFeatureName() + ", " + addressList2.get(0).getSubLocality());
-                        data.put("destination1", address.getLatitude());
-                        data.put("destination2", address.getLongitude());
-                        data.put("location1", "18.011042");
-                        data.put("location2", "-76.796428");
-                        data.put("name", "Tokyo");
-
-
-                        db.collection("Requests")
-                        .add(data)
-                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            public void onSuccess(DocumentReference documentReference) {
-                                Log.d("Success", "DocumentSnapshot written with ID: " + documentReference.getId());
-                                Toast.makeText(HomeScreen.this, "Taxi Request submitted", Toast.LENGTH_LONG).show();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w("Failure", "Error adding document", e);
-                                Toast.makeText(HomeScreen.this, "Taxi Request not submitted", Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }*/
         }
 
     }
@@ -402,4 +368,6 @@ public class HomeScreen extends AppCompatActivity implements
     public void onStatusChanged(String provider, int status, Bundle extras) {
         Log.d("Latitude","status");
     }
+
+   // private double
 }

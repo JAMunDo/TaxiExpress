@@ -1,6 +1,7 @@
 package com.example.taxiexpress;
 
 import android.content.Intent;
+import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.model.LatLng;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,15 +33,15 @@ import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import dialog.RequestMessage;
 import services.RequestService;
 
-public class MainActivity2 extends AppCompatActivity implements SearchView.OnQueryTextListener, DialogMessage.DialogMessageListener {
+public class MainActivity2 extends AppCompatActivity implements SearchView.OnQueryTextListener, RequestMessage.DialogMessageListener {
     public static final String Data = "TAXI.D.lat";
     public static final String Data1 ="TAXI.D.lng";
     public static final String Data2 = "TAXI.O.lat";
     public static final String Data3 = "TAXI.O.lng";
     SearchView searchView;
-    Geocoder geocoder;
     String fireid;
     HashMap<String, Double> hdest,hori;
     List<String> documentId = new ArrayList<>();
@@ -51,8 +53,8 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
     ArrayAdapter<String> adapter;
     Button dialog,refresh,service;
     List<String> test = new ArrayList<>();
-    List<String> lat = new ArrayList<>();
-    List<String> lng = new ArrayList<>();
+    List<Address> geoOrigin = new ArrayList<>();
+    List<Address> geoDest = new ArrayList<>();
     // Access a Cloud Firestore instance from your Activity
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -68,7 +70,6 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
        // searchView = findViewById(R.id.testsearch);
 
 
-
         listView = findViewById(R.id.testview);
         dialog.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,25 +83,44 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
                 db.collection("Requests").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        List<User> mMissionsList = new ArrayList<>();
-                        List<String> test = new ArrayList<>();
-                        if(task.isSuccessful()){
-                            for(DocumentSnapshot document : task.getResult()) {
-                                // User miss = document.toObject(User.class);
-                                test.add(document.getString("Name")+" \n"+document.getString("Latitude")+" \n"+document.getString("Longitude"));
-                                lat.add(document.getString("Latitude"));
-                                lng.add(document.getString("Longitude"));
+                        Geocoder geocoder =  new Geocoder(MainActivity2.this);
+                        test.clear();
+                        if (user != null) {
+                            int i=0;
+                            if(task.isSuccessful()){
+                                for(DocumentSnapshot document : task.getResult()) {
+                                    if(Objects.requireNonNull(user.getEmail()).contentEquals(Objects.requireNonNull(document.getString("taxiId")))) {
+                                        try {
+                                            dest.add(document.get("destination"));
+                                            ori.add(document.get("origin"));
+                                            hori =  (HashMap<String, Double>) ori.get(i);
+                                            hdest = (HashMap<String, Double>) dest.get(i);
+
+                                            geoOrigin = geocoder.getFromLocation(hori.get("lat"),hori.get("lng"),3);
+                                            geoDest = geocoder.getFromLocation(hdest.get("lat"),hdest.get("lng"),3);
+
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                        test.add(document.getString("name") + " \n"+
+                                                "Pickup:"+geoOrigin.get(i).getFeatureName()+
+                                                "\nDropoff:"+geoDest.get(i).getFeatureName());
+
+                                        i++;
+                                    }
+                                }
+
+                                ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1,test);
+                                adapter.notifyDataSetChanged();
+                                listView.setAdapter(adapter);
+                                Log.d("MissionActivity", "It reached the snapshot");
+                            } else {
+                                Log.d("MissionActivity", "Error getting documents: ", task.getException());
                             }
-                            ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1,test);
-                            adapter.notifyDataSetChanged();
-                            listView.setAdapter(adapter);
-                  /*  ListView mMissionsListView = (ListView) findViewById(R.id.missionList);
-                    MissionsAdapter mMissionAdapter = new MissionsAdapter(this, mMissionsList);
-                    mMissionsListView.setAdapter(mMissionAdapter);*/
-                            Log.d("MissionActivity", "It reached the snapshot");
                         } else {
-                            Log.d("MissionActivity", "Error getting documents: ", task.getException());
+                            Log.d("Firebase","No information provided");
                         }
+
                     }
                 });
             }
@@ -109,21 +129,34 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
 
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                Geocoder geocoder =  new Geocoder(MainActivity2.this);
                 if (user != null) {
-                    String email = user.getEmail();
                     Log.d("Firebase","User: "+user);
+                    int i=0;
 
                     if(task.isSuccessful()){
                         for(DocumentSnapshot document : task.getResult()) {
                             if(Objects.requireNonNull(user.getEmail()).contentEquals(Objects.requireNonNull(document.getString("taxiId")))) {
-                                test.add(document.getString("name") + " \n" + document.getString("description"));
+                                try {
                                 dest.add(document.get("destination"));
                                 ori.add(document.get("origin"));
                                 documentId.add(document.getId());
-                                lat.add(document.getString("Latitude"));
-                                lng.add(document.getString("Longitude"));
+                                hori =  (HashMap<String, Double>) ori.get(i);
+                                hdest = (HashMap<String, Double>) dest.get(i);
+
+                                    geoOrigin = geocoder.getFromLocation(hori.get("lat"),hori.get("lng"),3);
+                                    geoDest = geocoder.getFromLocation(hdest.get("lat"),hdest.get("lng"),3);
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                test.add(document.getString("name") + " \n"+
+                                        "Pickup:"+geoOrigin.get(i).getFeatureName()+
+                                        "\nDropoff:"+geoDest.get(i).getFeatureName());
+                                i++;
                             }
                         }
+
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1,test);
                     adapter.notifyDataSetChanged();
                     listView.setAdapter(adapter);
@@ -146,6 +179,7 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
                 destination = new LatLng(hdest.get("lat"),hdest.get("lng"));
                 origin = new LatLng(hori.get("lat"),hori.get("lng"));
                 fireid = documentId.get(position);
+
                 openDialog();
 
             }
@@ -161,7 +195,7 @@ public class MainActivity2 extends AppCompatActivity implements SearchView.OnQue
     }
 
     private void openDialog() {
-        DialogMessage dialog = new DialogMessage();
+        RequestMessage dialog = new RequestMessage();
         dialog.show(getSupportFragmentManager(),"Test");
     }
 

@@ -1,8 +1,14 @@
 package com.example.taxiexpress;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,11 +16,6 @@ import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
-import com.example.taxiexpress.credentials.Login;
-import com.example.taxiexpress.credentials.Register;
-import com.example.taxiexpress.main.HomeScreen;
-import com.example.taxiexpress.main.Routes;
-import com.google.firebase.auth.FirebaseAuth;
 
 public class Split extends AppCompatActivity{
     Button popupButton;
@@ -24,9 +25,21 @@ public class Split extends AppCompatActivity{
         setContentView(R.layout.activity_split);
         popupButton = findViewById(R.id.popup);
         popupButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
-                popupMenuExample();
+                NotificationManager notificationManager =
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                String channelId = "some_channel_id";
+                CharSequence channelName = "Some Channel";
+                int importance = NotificationManager.IMPORTANCE_LOW;
+                NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, importance);
+                notificationChannel.enableLights(true);
+                notificationChannel.setLightColor(Color.RED);
+                notificationChannel.enableVibration(true);
+                notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+                notificationManager.createNotificationChannel(notificationChannel);
+                notif();
             }
         });
     }
@@ -41,5 +54,21 @@ public class Split extends AppCompatActivity{
             }
         });
         p.show();
+    }
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private  void notif(){
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        int notifyId = 1;
+        String channelId = "some_channel_id";
+
+        Notification notification = new Notification.Builder(Split.this,channelId)
+                .setContentTitle("Some Message")
+                .setContentText("You've received new messages!!")
+                .setSmallIcon(R.drawable.logo)
+                .setAutoCancel(true)
+                .build();
+
+        notificationManager.notify(notifyId, notification);
     }
 }

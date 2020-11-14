@@ -1,4 +1,4 @@
-package com.example.taxiexpress;
+package dialog;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
-public class DialogMessage extends AppCompatDialogFragment {
+public class TaxiMessage extends AppCompatDialogFragment {
     private DialogMessageListener listener;
 
     @NonNull

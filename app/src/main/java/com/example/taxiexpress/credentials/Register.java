@@ -60,9 +60,8 @@ public class Register extends AppCompatActivity implements
      * @param name
      * @param phone
      * @param username
-     * @param type
      */
-    public void registerNewEmail(final String email, final String password, final String name, final String phone, final String username,final int type){
+    public void registerNewEmail(final String email, final String password, final String name, final String phone, final String username){
 
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -70,42 +69,42 @@ public class Register extends AppCompatActivity implements
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
 
-                        if (task.isSuccessful()){
-                            if(type==500){
-                            Log.d(TAG, "onComplete: AuthState: " + FirebaseAuth.getInstance().getCurrentUser().getUid());
+                        if (task.isSuccessful()) {
+                           // if (type == 500) {
+                                Log.d(TAG, "onComplete: AuthState: " + FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-                            //insert some default data
-                            User user = new User();
-                            user.setName(name);
-                            user.setPhone(phone);
-                            user.setEmail(email);
-                            user.setUsername(username);
-                            user.setPassword(password);
-                            user.setType(type);
-                            user.setUser_id(FirebaseAuth.getInstance().getUid());
+                                //insert some default data
+                                User user = new User();
+                                user.setName(name);
+                                user.setPhone(phone);
+                                user.setEmail(email);
+                                user.setUsername(username);
+                                user.setPassword(password);
+                                //user.setType(type);
+                                user.setUser_id(FirebaseAuth.getInstance().getUid());
 
-                            FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                                    .build();
-                            mDb.setFirestoreSettings(settings);
+                                FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                                        .build();
+                                mDb.setFirestoreSettings(settings);
 
-                            DocumentReference newUserRef = mDb
-                                    .collection(getString(R.string.collection_users))
-                                    .document(FirebaseAuth.getInstance().getUid());
+                                DocumentReference newUserRef = mDb
+                                        .collection(getString(R.string.collection_users))
+                                        .document(FirebaseAuth.getInstance().getUid());
 
-                            newUserRef.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
+                                newUserRef.set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
 
-                                    if(task.isSuccessful()){
-                                        redirectLoginScreen();
-                                    }else{
-                                        View parentLayout = findViewById(android.R.id.content);
-                                        Snackbar.make(parentLayout, "Something went wrong.", Snackbar.LENGTH_SHORT).show();
+                                        if (task.isSuccessful()) {
+                                            redirectLoginScreen();
+                                        } else {
+                                            View parentLayout = findViewById(android.R.id.content);
+                                            Snackbar.make(parentLayout, "Something went wrong.", Snackbar.LENGTH_SHORT).show();
+                                        }
                                     }
-                                }
-                            });
+                                });
 
-                        }else if(type==600){
+                            /*}else if(type==600){
                                 Log.d(TAG, "onComplete: AuthState: " + FirebaseAuth.getInstance().getCurrentUser().getUid());
 
                                 //insert some default data
@@ -138,27 +137,28 @@ public class Register extends AppCompatActivity implements
                                         }
                                     }
                                 });
-                            }
-                        else {
+                            }*/
+                        }else {
                             View parentLayout = findViewById(android.R.id.content);
                             Snackbar.make(parentLayout, "Something went wrong.", Snackbar.LENGTH_SHORT).show();
                         }
 
                         // ...
-                    }}
+                    }
                 });
     }
 
+
     @Override
     public void onClick(View view) {
-        toggle= findViewById(R.id.toggleButton);
+     //   toggle= findViewById(R.id.toggleButton);
         if (view.getId() == R.id.register) {
             Log.d(TAG, "onClick: attempting to register.");
 
             //check for null valued EditText fields
             if (!isEmpty(memail.getText().toString())
                     && !isEmpty(pw.getText().toString())) {
-                toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+               /* toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
                     if (isChecked) {
                         // The toggle is enabled // set the value for the user if he is a driver
                         type= 600;
@@ -166,9 +166,9 @@ public class Register extends AppCompatActivity implements
                         // The toggle is disabled // set the value for the user if he is a customer
                         type=500;
                     }
-                });
+                });*/
                 //Initiate registration task
-                registerNewEmail(memail.getText().toString(), pw.getText().toString(),fname.getText().toString(),phone.getText().toString(),uname.getText().toString(),600);
+                registerNewEmail(memail.getText().toString(), pw.getText().toString(),fname.getText().toString(),phone.getText().toString(),uname.getText().toString());
                 //redirectLoginScreen();
             } else {
                 Toast.makeText(Register.this, "You must fill out all the fields", Toast.LENGTH_SHORT).show();

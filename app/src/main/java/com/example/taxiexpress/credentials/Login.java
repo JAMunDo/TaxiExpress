@@ -7,11 +7,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.taxiexpress.MainActivity2;
+import com.example.taxiexpress.User;
 import com.example.taxiexpress.main.HomeScreen;
 import com.example.taxiexpress.main.Profile;
 import com.example.taxiexpress.R;
@@ -21,6 +24,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
 
@@ -30,9 +39,12 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
 
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     ImageView register,phone,forgot;
     ImageButton signin;
     EditText email,password;
+    boolean cust = false;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,13 +71,28 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    Toast.makeText(Login.this, "Authenticated with: " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(Login.this, Profile.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    finish();
-
+                    db.collection("Users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if(task.isSuccessful()){
+                                for(DocumentSnapshot document : task.getResult()) {
+                                    if(document.getString("email").contentEquals(user.getEmail())){
+                                        cust = true;;
+                                    }
+                                }
+                                Log.d("MissionActivity", "It reached the snapshot");
+                            } else {
+                                Log.d("MissionActivity", "Error getting documents: ", task.getException());
+                            }
+                        }
+                    });
+                    if(cust){
+                        Intent profile = new Intent(Login.this, HomeScreen.class);
+                        startActivity(profile);
+                    }else{
+                        Intent taxi = new Intent(Login.this, MainActivity2.class);
+                        startActivity(taxi);
+                    }
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
@@ -88,7 +115,7 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
     }
-
+    //Sign in method
     private void signIn(){
         //check if the fields are filled out
         if(!isEmpty(email.getText().toString())
@@ -102,8 +129,7 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()) {
-                                Intent profile = new Intent(Login.this, HomeScreen.class);
-                                startActivity(profile);
+                               loginPathway();
                             }else{
                                 Toast.makeText(Login.this, "Incorrect Login", Toast.LENGTH_SHORT).show();
                             }
@@ -118,7 +144,7 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
             Toast.makeText(Login.this, "You didn't fill in all the fields.", Toast.LENGTH_SHORT).show();
         }
     }
-
+    //Bottom nav method
     @Override
     public void onClick(View view) {
         switch (view.getId()){
@@ -142,6 +168,33 @@ public class Login extends AppCompatActivity implements  View.OnClickListener {
                 startActivity(forgot);
                 break;
             }
+        }
+    }
+    //Method to decide if its a cust or driver
+    private void loginPathway (){
+        //user.getEmail();
+
+        db.collection("Users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    for(DocumentSnapshot document : task.getResult()) {
+                        if(document.getString("email").contentEquals(email.getText().toString())){
+                            cust = true;;
+                        }
+                    }
+                    Log.d("MissionActivity", "It reached the snapshot");
+                } else {
+                    Log.d("MissionActivity", "Error getting documents: ", task.getException());
+                }
+            }
+        });
+        if(cust){
+            Intent profile = new Intent(Login.this, HomeScreen.class);
+            startActivity(profile);
+        }else{
+            Intent taxi = new Intent(Login.this, MainActivity2.class);
+            startActivity(taxi);
         }
     }
 }

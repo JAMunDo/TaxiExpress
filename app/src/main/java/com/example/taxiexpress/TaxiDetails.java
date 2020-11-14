@@ -2,6 +2,7 @@ package com.example.taxiexpress;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import dialog.TaxiMessage;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ import android.widget.Toast;
 import com.example.taxiexpress.main.HomeScreen;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -25,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class TaxiDetails extends AppCompatActivity implements DialogMessage.DialogMessageListener {
+public class TaxiDetails extends AppCompatActivity implements TaxiMessage.DialogMessageListener {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     ListView listView;
     ArrayList<String> list;
@@ -35,6 +38,7 @@ public class TaxiDetails extends AppCompatActivity implements DialogMessage.Dial
     List<String> test = new ArrayList<>();
     List<String> plate = new ArrayList<>();
     List<String> cmp = new ArrayList<>();
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +82,7 @@ public class TaxiDetails extends AppCompatActivity implements DialogMessage.Dial
     }
 
     private void openDialog() {
-        DialogMessage dialog = new DialogMessage();
+        TaxiMessage dialog = new TaxiMessage();
         dialog.show(getSupportFragmentManager(),"Test");
     }
 
@@ -88,9 +92,7 @@ public class TaxiDetails extends AppCompatActivity implements DialogMessage.Dial
         Log.d("MissionActivity", "Yess clicked works");
         TaxiRequest taxiRequest = new TaxiRequest();
         Intent intent = getIntent();
-        String dlat = intent.getStringExtra(com.example.taxiexpress.main.HomeScreen.Unique4);
-        String dlng =  intent.getStringExtra(HomeScreen.Unique3);
-        taxiRequest.setName("Paul Walker");
+        taxiRequest.setName(user.getUid());
         taxiRequest.setCompany(company);
         taxiRequest.setDestination(new LatLng(Double.parseDouble(intent.getStringExtra(HomeScreen.Unique4)),
                 Double.parseDouble(intent.getStringExtra(HomeScreen.Unique3))));
@@ -101,6 +103,8 @@ public class TaxiDetails extends AppCompatActivity implements DialogMessage.Dial
         if(taxiRequest.postTaxiRequest(taxiRequest)){
             Toast.makeText(TaxiDetails.this, "Request sent", Toast.LENGTH_LONG).show();
             Log.d("TaxiRequest", "Request sent");
+            Intent profile = new Intent(TaxiDetails.this, Success.class);
+            startActivity(profile);
         }else{
             Toast.makeText(TaxiDetails.this, "Request failed", Toast.LENGTH_LONG).show();
             Log.d("TaxiRequest", "Request failed");
