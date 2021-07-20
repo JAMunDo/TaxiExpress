@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Taxi Express</string>
     <string name="title_activity_maps">Map</string>
-    <string name="map_key" translatable="false">AIzaSyD0oWYV8aYcqUYCD2v9B75D-OkwNv_QKRw</string>
+    <string name="map_key" translatable="false">YOUR KEY HERE</string>
     <string name="title_activity_location">Map</string>
     <string name="collection_users">Users</string>
     <string name="collection_drivers">Drivers</string>
