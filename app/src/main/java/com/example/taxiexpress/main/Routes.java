@@ -28,7 +28,7 @@ public class Routes extends AppCompatActivity implements SearchView.OnQueryTextL
     SearchView searchView;
     ListView listView;
     ArrayList<String> list;
-    String [] values = {"Romario","Kehli","Keisha","Daequan"};
+    String [] values = {"Mario","Kelly","Keisha","Daequan"};
     ArrayAdapter<String> adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
